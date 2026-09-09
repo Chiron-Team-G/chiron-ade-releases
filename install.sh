@@ -72,9 +72,17 @@ ZIP="chiron-ade${SLUG}-${ARCH}-mac.zip"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-echo "Downloading $APP_NAME ($ARCH)…"
+echo "Downloading ${APP_NAME} (${ARCH})…"
 if ! curl -fL --progress-bar "$BASE/$ZIP" -o "$TMP/$ZIP"; then
-  echo "Could not download $BASE/$ZIP" >&2
+  # A missing file is almost always ONE thing: this channel has no build for
+  # this architecture yet. Saying so beats printing a URL, because the person
+  # reading it is on an Intel Mac and cannot act on a 404.
+  echo "" >&2
+  echo "There is no ${ARCH} build of ${APP_NAME} on the ${CHANNEL} channel yet." >&2
+  if [ "$ARCH" = "x64" ]; then
+    echo "Intel Macs are not built yet; Apple Silicon is." >&2
+  fi
+  echo "What is published: https://github.com/${REPO}/releases" >&2
   exit 1
 fi
 
