@@ -43,9 +43,19 @@ esac
 # Engineers and keeps its own sessions, so a dev build can never answer for a
 # production one.
 case "$CHANNEL" in
-  prod) APP_NAME="Chiron ADE";      SLUG="" ;;
-  beta) APP_NAME="Chiron ADE Beta"; SLUG="-beta" ;;
-  dev)  APP_NAME="Chiron ADE Dev";  SLUG="-dev" ;;
+  # The bundle these names produce must match what the build actually ships —
+  # the product was renamed to "Chiron Studio" (electron-builder.config.cjs),
+  # and this file decides what the .app is CALLED on disk. Left at the old name
+  # it installs "Chiron Studio.app" as "Chiron ADE.app": it works, but the Dock
+  # and the About box then disagree with the file, and the next installer looks
+  # for a running copy under a name nothing answers to.
+  #
+  # The DATA directory keeps the old name on purpose and is unrelated — see
+  # `USER_DATA_NAME` in src/main/user-data.ts. Renaming that would move the
+  # keychain item and sign everybody out.
+  prod) APP_NAME="Chiron Studio";      SLUG="" ;;
+  beta) APP_NAME="Chiron Studio Beta"; SLUG="-beta" ;;
+  dev)  APP_NAME="Chiron Studio Dev";  SLUG="-dev" ;;
 esac
 
 if [ "$(uname -s)" != "Darwin" ]; then
